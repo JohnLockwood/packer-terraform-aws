@@ -1,0 +1,30 @@
+{
+
+ "variables": {
+    "region": "",
+    "source_ami": ""
+  },
+
+ "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "{{ user `region` }}",
+      "source_ami": "{{ user `source_ami` }}",
+      "instance_type": "t2.micro",
+      "ssh_username": "ubuntu",
+      "ami_name": "Ubuntu Haiku Server {{timestamp}}"
+    }
+  ],
+
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "haiku",
+      "destination": "$HOME/haiku"
+    },
+    {
+      "type": "shell",
+      "inline": "sudo mv $HOME/haiku /etc/motd"
+    }
+  ]
+}
