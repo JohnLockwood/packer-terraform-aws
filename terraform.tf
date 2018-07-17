@@ -22,8 +22,13 @@ resource "aws_key_pair" "deployer" {
 }
 
 /* 
-  Create a security group to allow SSH.
+  Create a security group to allow SSH.  Limit IP addresses access to local machine.
 */
+
+data "http" "ip" {
+  url = "http://icanhazip.com"
+}
+
 resource "aws_security_group" "allow_ssh" {
   name        = "allow_ssh"
   description = "Allow SSH"
@@ -32,15 +37,11 @@ resource "aws_security_group" "allow_ssh" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [
+      "${chomp(data.http.ip.body)}/32"
+    ]
   }
 
-  egress {
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    cidr_blocks     = ["0.0.0.0/0"]    
-  }
 }
 
 /*

@@ -8,5 +8,9 @@
 # .tfvars files
 *.tfvars
 
-haikukey
-haikukey.pub
+# SSH keys for AWS Server
+haiku_key
+haiku_key.pub
+
+# Generated login script.
+sshlogin.sh
