@@ -41,7 +41,6 @@ resource "aws_security_group" "allow_ssh" {
       "${chomp(data.http.ip.body)}/32"
     ]
   }
-
 }
 
 /*
