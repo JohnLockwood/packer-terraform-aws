@@ -23,7 +23,7 @@ You should see the haiku message of the day when the script automatically logs y
 
 ## Cleanup
 
-After exiting out of the SSH script, you can use the "destroy.sh" script to delete the resources that Terraform created.  Since it is not managed by terraform, the AMI that Packer creates will need to be deleted separately by loggging into the AWS console, changing region to US East (Ohio) and going to Services / EC2 and clicking on AMIs.  Filter by "Owned by Me" or "Private Images" and look for the name beginning "Ubuntu Haiku Server".  You should also delete any snapshots associated with the AMIs.
+After exiting out of the SSH script, you can use the "destroy.sh" script to delete the resources that Terraform created.  Since it is not managed by Terraform, the AMI that Packer creates will need to be deleted separately by logging into the AWS console, changing region to US East (Ohio) and going to Services / EC2 and clicking on AMIs.  Filter by "Owned by Me" or "Private Images" and look for the name beginning "Ubuntu Haiku Server".  You should also delete any snapshots associated with the AMIs.
 
 ## Article
 
