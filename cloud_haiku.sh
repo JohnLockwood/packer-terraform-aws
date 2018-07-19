@@ -11,22 +11,21 @@ else
   echo "Key ${key_name} exists, skipping key generation"
 fi
 
-
-
-# Build AMI image, storing results so we can parse AMI out and pass it to terraform
+# Build an ami AMI image, storing results so we can parse AMI out and pass it to terraform
 echo "Building AMI Image based on source AMI $source_ami"
 packer build -var source_ami="$source_ami" -var region="$region"  packer.json 2>&1 | tee output.txt
 if [ $? -ne 0 ]; then
 	echo "Packer build failed, exiting"
 	exit 1
 fi
+
+# Parse the ami ID from the packer output to pass to Terraform
 target_ami=`tail -2 output.txt | head -2 | awk 'match($0, /ami-.*/) { print substr($0, RSTART, RLENGTH) }'`
 
-
-
 echo "Built AMI $target_ami using Packer, now launching it using Terraform"
-terraform apply -auto-approve -var ami_image="$target_ami" -var key_name="${key_name}" -var public_key="${key_name}.pub" -var region="${region}"
+terraform apply -auto-approve -var ami_image="${target_ami}" -var key_name="${key_name}" -var public_key="${key_name}.pub" -var region="${region}"
 
+# On success wait for the machine to come up (on failure Terraform already displayed an error).
 if [ $? -eq 0 ]; then
 	echo "Sleeping for 10 seconds to allow machine to be ready..."
 	sleep 10
@@ -36,6 +35,7 @@ if [ $? -eq 0 ]; then
 	./sshlogin.sh
 fi
 
+# Clean up our temporary file
 if [ -f output.txt ]; then
 	rm output.txt
 fi

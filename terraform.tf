@@ -1,37 +1,33 @@
-/* 
-  These are set in the bash script cloud_haiku.sh
-*/
+/* Terraform Variables.  These are set in the bash script cloud_haiku.sh */
 variable "region" {}
 variable "ami_image" {}
 variable "key_name" {}
 variable "public_key" {}
 
-
+/* First time through we need to call "terraform init" */
 provider "aws" {
   region     = "${var.region}"
 }
 
 
-/* 
-  To enable ssh access use the key-pair created by our bash script.
-  Note: name could be passed as another parameter.
-*/
+/* Enable ssh access to this resource using the key-pair created by our bash script.  */
 resource "aws_key_pair" "deployer" {
   key_name   = "${var.key_name}"
   public_key = "${file(var.public_key)}"
 }
 
-/* 
-  Create a security group to allow SSH.  Limit IP addresses access to local machine.
-*/
-
+/* Get our local machine's IP address for good-enough-for-demo security */
 data "http" "ip" {
   url = "http://icanhazip.com"
 }
 
+/* 
+  Create a security group to allow SSH access.  
+  Limit IP addresses access to local machine IP we got in the last step. 
+*/
 resource "aws_security_group" "allow_ssh" {
   name        = "allow_ssh"
-  description = "Allow SSH"
+  description = "Allow SSH to the cloud haiku instance."
 
   ingress {
     from_port   = 22
@@ -56,6 +52,7 @@ resource "aws_instance" "cloud-haiku" {
     Name = "cloud-haiku"
   }
 
+  /* Create a login script since we know the IP.  An alternative would be to do that in the parent script */
   provisioner "local-exec" {
     command = "echo ssh -oStrictHostKeyChecking=no ubuntu@${aws_instance.cloud-haiku.public_ip} -i ${var.key_name} > sshlogin.sh"    
   }
